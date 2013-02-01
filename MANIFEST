@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/POEx/IRC/Backend.pm
+lib/POEx/IRC/Backend/Connect.pm
+lib/POEx/IRC/Backend/Connector.pm
+lib/POEx/IRC/Backend/Listener.pm
+lib/POEx/IRC/Backend/_Util.pm
+t/backend.t
+t/release-pod-syntax.t

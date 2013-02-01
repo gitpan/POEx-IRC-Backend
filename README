@@ -1,0 +1,288 @@
+NAME
+    POEx::IRC::Backend - IRC client or server sockets
+
+SYNOPSIS
+      ## Spawn a Backend and register as the controlling session.
+      my $backend = POEx::IRC::Backend->spawn(
+        ## See POE::Component::SSLify (SSLify_Options):
+        ssl_opts => [ ARRAY ],
+      );
+
+      $poe_kernel->post( $backend->session_id, 'register' );
+
+      $backend->create_listener(
+        bindaddr => $addr,
+        port     => $port,
+        ## Optional:
+        ipv6     => 1,
+        ssl      => 1,
+      );
+
+      $backend->create_connector(
+        remoteaddr => $remote,
+        remoteport => $remoteport,
+        ## Optional:
+        bindaddr => $bindaddr,
+        ipv6     => 1,
+        ssl      => 1,
+      );
+
+      ## Handle and dispatch incoming IRC events.
+      sub ircsock_input {
+        my ($kernel, $self) = @_[KERNEL, OBJECT];
+
+        ## POEx::IRC::Backend::Connect obj:
+        my $this_conn = $_[ARG0];
+
+        ## IRC::Message::Object obj:
+        my $input_obj = $_[ARG1];
+
+        my $cmd = $input_obj->command;
+
+        ## ... dispatch, etc ...
+      }
+
+DESCRIPTION
+    A POE IRC backend socket handler using POE::Filter::IRCv3 and
+    IRC::Toolkit.
+
+    This can be used by client/server libraries to speak IRC protocol via
+    IRC::Message::Object objects.
+
+    This module is part of a set of IRC building blocks that have been split
+    out of a much larger project; it is also early 'alpha-quality' software.
+    Take a gander at POE::Component::IRC for a fully-featured IRC library.
+
+  Attributes
+   controller
+    Retrieve the POE::Session ID for the backend's registered controller.
+
+    Predicate: has_controller
+
+   connectors
+    A HASH of active Connector objects, keyed on their wheel ID.
+
+   listeners
+    HASH of active Listener objects, keyed on their wheel ID.
+
+   session_id
+    Returns the backend's session ID.
+
+   wheels
+    HASH of actively connected wheels, keyed on their wheel ID.
+
+  Methods
+   spawn
+      my $backend = POEx::IRC::Backend->spawn(
+        ## Optional, needed for SSL-ified server-side sockets
+        ssl_opts => [
+          'server.key',
+          'server.cert',
+        ],
+      );
+
+   create_connector
+      $backend->create_connector(
+        remoteaddr => $addr,
+        remoteport => $addr,
+        ## Optional:
+        bindaddr => $local_addr,
+        ipv6 => 1,
+        ssl  => 1,
+      );
+
+    Attempts to create a POEx::IRC::Backend::Connector that holds a
+    POE::Wheel::SocketFactory connector wheel; connectors will attempt to
+    establish an outgoing connection immediately.
+
+   create_listener
+      $backend->create_listener(
+        bindaddr => $addr,
+        port     => $port,
+        ## Optional:
+        ipv6     => 1,
+        ssl      => 1,
+        idle     => $seconds,
+      );
+
+    Attempts to create a POEx::IRC::Backend::Listener that holds a
+    POE::Wheel::SocketFactory listener wheel.
+
+   remove_listener
+        $backend->remove_listener(
+          listener => $listener_id,
+        );
+
+        ## or via addr, port, or combination thereof:
+        $backend->remove_listener(
+          addr => '127.0.0.1',
+          port => 6667,
+        );
+
+    Removes a listener and clears its wheel attribute; the socket shuts down
+    when the POE::Wheel::SocketFactory wheel goes out of scope.
+
+   disconnect
+      $backend->disconnect($wheel_id, $disconnect_string);
+
+    Given a connection's wheel ID, mark the specified wheel for
+    disconnection.
+
+   send
+      $backend->send(
+        {
+          prefix  => $prefix,
+          params  => [ @params ],
+          command => $cmd,
+        },
+        @connect_ids
+      );
+
+      use IRC::Message::Object 'ircmsg';
+      my $msg = ircmsg(
+        command => 'PRIVMSG',
+        params  => [ $chan, $string ],
+      );
+      $backend->send( $msg, $connect_id );
+
+    Feeds POE::Filter::IRCv3 and sends the resultant raw IRC line to the
+    specified connection wheel ID(s).
+
+    Accepts either an IRC::Message::Object or a HASH compatible with
+    POE::Filter::IRCv3 -- look there for details.
+
+   set_compressed_link
+      $backend->set_compressed_link( $conn_id );
+
+    Mark a specified connection wheel ID as pending compression;
+    POE::Filter::Zlib::Stream will be added to the filter stack when the
+    next flush event arrives.
+
+   set_compressed_link_now
+      $backend->set_compressed_link_now( $conn_id );
+
+    Add a POE::Filter::Zlib::Stream to the connection's filter stack
+    immediately, rather than upon next flush event.
+
+   unset_compressed_link
+      $backend->unset_compressed_link( $conn_id );
+
+    Remove POE::Filter::Zlib::Stream from the connection's filter stack.
+
+  Received events
+   register
+      $poe_kernel->post( $backend->session_id,
+        'register'
+      );
+
+    Register the sender session as the backend's controller session. The
+    last session to send 'register' is the session that receives
+    notification events from the backend component.
+
+   create_connector
+    Event interface to *create_connector* -- see "Methods"
+
+   create_listener
+    Event interface to *create_listener* -- see "Methods"
+
+   remove_listener
+    Event interface to *remove_listener* -- see "Methods"
+
+   send
+    Event interface to */send* -- see "Methods"
+
+   shutdown
+    Disconnect all wheels and clean up.
+
+  Dispatched events
+    These events are dispatched to the controller session; see "register".
+
+   ircsock_compressed
+    Dispatched when a connection wheel has had a compression filter added.
+
+    $_[ARG0] is the connection's POEx::IRC::Backend::Connect
+
+   ircsock_connection_idle
+    Dispatched when a connection wheel has had no input for longer than
+    specified idle time (see "create_listener" regarding idle times).
+
+    $_[ARG0] is the connection's POEx::IRC::Backend::Connect
+
+   ircsock_connector_failure
+    Dispatched when a Connector has failed due to some sort of socket error.
+
+    $_[ARG0] is the connection's POEx::IRC::Backend::Connector with wheel()
+    cleared.
+
+    @_[ARG1 .. ARG3] contain the socket error details reported by
+    POE::Wheel::SocketFactory; operation, errno, and errstr, respectively.
+
+   ircsock_connector_open
+    Dispatched when a Connector has established a connection to a peer.
+
+    $_[ARG0] is the POEx::IRC::Backend::Connect for the connection.
+
+   ircsock_disconnect
+    Dispatched when a connection wheel has been cleared.
+
+    $_[ARG0] is the connection's POEx::IRC::Backend::Connect with wheel()
+    cleared.
+
+   ircsock_input
+    Dispatched when there is some IRC input from a connection wheel.
+
+    $_[ARG0] is the connection's POEx::IRC::Backend::Connect.
+
+    $_[ARG1] is an IRC::Message::Object.
+
+   ircsock_listener_created
+    Dispatched when a POEx::IRC::Backend::Listener has been created.
+
+    $_[ARG0] is the POEx::IRC::Backend::Listener instance; the instance's
+    port() is altered based on getsockname() details after socket creation
+    and before dispatching this event.
+
+   ircsock_listener_failure
+    Dispatched when a Listener has failed due to some sort of socket error.
+
+    $_[ARG0] is the POEx::IRC::Backend::Listener object.
+
+    @_[ARG1 .. ARG3] contain the socket error details reported by
+    POE::Wheel::SocketFactory; operation, errno, and errstr, respectively.
+
+   ircsock_listener_open
+    Dispatched when a listener accepts a connection.
+
+    $_[ARG0] is the connection's POEx::IRC::Backend::Connect
+
+    $_[ARG1] is the connection's POEx::IRC::Backend::Listener
+
+   ircsock_listener_removed
+    Dispatched when a Listener has been removed.
+
+    $_[ARG0] is the POEx::IRC::Backend::Listener object.
+
+   ircsock_registered
+    Dispatched when a "register" event has been successfully received, as a
+    means of acknowledging the controlling session.
+
+    $_[ARG0] is the Backend's $self object.
+
+BUGS
+    Probably lots. Please report them via RT, e-mail, or GitHub
+    (<http://github.com/avenj/poex-irc-backend>).
+
+    Tests are a bit incomplete, as of this writing. Zlib and SSL are mostly
+    untested.
+
+SEE ALSO
+    IRC::Toolkit
+
+    POE::Filter::IRCv3
+
+AUTHOR
+    Jon Portnoy <avenj@cobaltirc.org>
+
+    Inspiration derived from POE::Component::Server::IRC::Backend and
+    POE::Component::IRC by BINGOS, HINRIK et al
+
