@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "IRC::Toolkit" => 0,
     "Moo" => 1,
-    "MooX::Types::MooseLike" => 0,
+    "MooX::Types::MooseLike" => "0.15",
     "Net::IP::Minimal" => "0.04",
     "POE" => "1.3",
     "POE::Component::SSLify" => "1.006",
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "strictures" => 1
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }

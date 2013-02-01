@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Connect;
 {
-  $POEx::IRC::Backend::Connect::VERSION = '0.01';
+  $POEx::IRC::Backend::Connect::VERSION = '0.02';
 }
 
 use 5.10.1;
@@ -77,7 +77,6 @@ has 'peeraddr' => (
 
 has 'peerport' => (
   required => 1,
-  isa      => Int,
   is       => 'ro',
   writer   => 'set_peerport',
 );
@@ -113,7 +112,6 @@ has 'sockaddr' => (
 
 has 'sockport' => (
   required => 1,
-  isa      => Int,
   is       => 'ro',
   writer   => 'set_sockport',
 );

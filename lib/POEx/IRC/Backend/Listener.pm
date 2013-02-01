@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Listener;
 {
-  $POEx::IRC::Backend::Listener::VERSION = '0.01';
+  $POEx::IRC::Backend::Listener::VERSION = '0.02';
 }
 
 use 5.10.1;
@@ -32,7 +32,6 @@ has 'idle'  => (
 
 has 'port'  => (
   required => 1,
-  isa      => Int,
   is       => 'ro',
   writer   => 'set_port',
 );
