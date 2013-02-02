@@ -1,5 +1,8 @@
 # Changes for POEx::IRC::Backend
 
+0.021   (02 Feb 2013)
+    POD expansion
+
 0.02    (01 Feb 2013)
     Depend on newer MooX::Types::MooseLike
     Tweak Connect objs to allow service name in ->port

@@ -70,6 +70,26 @@ Predicate: __has\_controller__
 
 A HASH of active Connector objects, keyed on their wheel ID.
 
+### filter
+
+A [POE::Filter::Stackable](http://search.cpan.org/perldoc?POE::Filter::Stackable) instance consisting of the current ["filter\_irc"](#filter\_irc)
+stacked with ["filter\_line"](#filter\_line) (at the time the attribute is built).
+
+### filter\_irc
+
+A [POE::Filter::IRCv3](http://search.cpan.org/perldoc?POE::Filter::IRCv3) instance with __colonify__ enabled, by default.
+
+A client-side Backend will probably want a non-colonifying filter:
+
+    my $backend = POEx::IRC::Backend->new(
+      filter_irc => POE::Filter::IRCv3->new(colonify => 0),
+      ...
+    );
+
+### filter\_line
+
+A [POE::Filter::Line](http://search.cpan.org/perldoc?POE::Filter::Line) instance.
+
 ### listeners
 
 HASH of active Listener objects, keyed on their wheel ID.

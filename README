@@ -62,6 +62,23 @@ DESCRIPTION
    connectors
     A HASH of active Connector objects, keyed on their wheel ID.
 
+   filter
+    A POE::Filter::Stackable instance consisting of the current "filter_irc"
+    stacked with "filter_line" (at the time the attribute is built).
+
+   filter_irc
+    A POE::Filter::IRCv3 instance with colonify enabled, by default.
+
+    A client-side Backend will probably want a non-colonifying filter:
+
+      my $backend = POEx::IRC::Backend->new(
+        filter_irc => POE::Filter::IRCv3->new(colonify => 0),
+        ...
+      );
+
+   filter_line
+    A POE::Filter::Line instance.
+
    listeners
     HASH of active Listener objects, keyed on their wheel ID.
 

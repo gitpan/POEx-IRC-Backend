@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Connector;
 {
-  $POEx::IRC::Backend::Connector::VERSION = '0.02';
+  $POEx::IRC::Backend::Connector::VERSION = '0.021';
 }
 
 use 5.10.1;
@@ -19,19 +19,19 @@ has 'addr' => (
   writer   => 'set_addr',
 );
 
+has 'args' => (
+  lazy    => 1,
+  is      => 'ro',
+  writer  => 'set_args',
+  default => sub { {} },
+);
+
 has 'bindaddr' => (
   lazy      => 1,
   is        => 'ro',
   predicate => 'has_bindaddr',
   writer    => 'set_bindaddr',
   default => sub { '' },
-);
-
-has 'args' => (
-  lazy    => 1,
-  is      => 'ro',
-  writer  => 'set_args',
-  default => sub { {} },
 );
 
 has 'port' => (
