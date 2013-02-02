@@ -1,6 +1,6 @@
 package POEx::IRC::Backend;
 {
-  $POEx::IRC::Backend::VERSION = '0.021';
+  $POEx::IRC::Backend::VERSION = '0.022';
 }
 
 use 5.10.1;
@@ -118,24 +118,26 @@ has 'filter' => (
 has 'listeners' => (
   init_arg => undef,
   is      => 'ro',
+  writer  => '_set_listeners',
   default => sub { {} },
-  clearer => '_clear_listeners',
 );
 
 ## POEx::IRC::Backend::Connector objs
 ## These are outgoing (peer) connectors.
 has 'connectors' => (
+  init_arg => undef,
   is      => 'ro',
+  writer  => '_set_connectors',
   default => sub { {} },
-  clearer => '_clear_connectors',
 );
 
 ## POEx::IRC::Backend::Connect objs
 ## These are our connected wheels.
 has 'wheels' => (
+  init_arg => undef,
   is      => 'ro',
+  writer  => '_set_wheels',
   default => sub { {} },
-  clearer => '_clear_wheels',
 );
 
 
@@ -239,9 +241,9 @@ sub _shutdown {
   $self->_disconnected($_, "Server shutdown")
     for keys %{ $self->wheels // {} };
 
-  $self->_clear_listeners;
-  $self->_clear_connectors;
-  $self->_clear_wheels;
+  for my $attr (map {; '_set_'.$_ } qw/ listeners connectors wheels /) {
+    $self->$attr({})
+  }
 }
 
 sub _register_controller {
@@ -359,9 +361,8 @@ sub _accept_fail {
 sub create_listener {
   my $self = shift;
 
-  $poe_kernel->post( $self->session_id,
-    'create_listener',
-    @_
+  $poe_kernel->post( $self->session_id =>
+    create_listener => @_
   );
 
   $self
@@ -425,12 +426,6 @@ sub _create_listener {
 
 sub remove_listener {
   my $self = shift;
-
-  my %args = @_;
-  $args{lc $_} = delete $args{$_} for keys %args;
-
-  confess "remove_listener requires either port => or listener => params"
-    unless defined $args{port} or defined $args{listener};
 
   $poe_kernel->post( $self->session_id =>
     remove_listener => @_
@@ -636,9 +631,6 @@ sub _ircsock_input {
   ## Retrieve Backend::Connect
   my $this_conn = $self->wheels->{$w_id};
 
-  ## Disconnecting? Don't care.
-  return if $this_conn->is_disconnecting;
-
   ## Adjust last seen and idle alarm
   $this_conn->seen( time );
   $kernel->delay_adjust( $this_conn->alarm_id, $this_conn->idle )
@@ -714,10 +706,8 @@ sub send {
 
   }
 
-  unless (@ids && ref $out eq 'HASH') {
-    carp "send() takes a HASH and a list of connection IDs";
-    return
-  }
+  confess "send() takes a HASH and a list of connection IDs"
+    unless ref $out eq 'HASH' and @ids;
 
   for my $id (grep { $self->wheels->{$_} } @ids) {
     $self->wheels->{$id}->wheel->put( $out );

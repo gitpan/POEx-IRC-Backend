@@ -11,8 +11,8 @@ my $expected = {
   'got listener_created' => 1,
   'got connector_open'   => 1,
   'got listener_open'    => 1,
+  'got listener_removed' => 1,
   'got ircsock_input'    => 2,
-#  'got disconnect'       => 1,
 };
 my $got = {};
 
@@ -29,7 +29,6 @@ POE::Session->create(
       ircsock_listener_removed
       ircsock_listener_failure
       ircsock_listener_open
-      ircsock_disconnect
       ircsock_input
     / ],
   ],
@@ -94,7 +93,14 @@ sub ircsock_connector_open {
 }
 
 sub ircsock_listener_removed {
-  ## FIXME test listener_removed
+  my ($k, $backend) = @_[KERNEL, HEAP];
+  my $listener = $_[ARG0];
+
+  isa_ok( $listener, 'POEx::IRC::Backend::Listener' );
+
+  $got->{'got listener_removed'}++;
+
+  $k->yield( shutdown => 1 )
 }
 
 sub ircsock_listener_failure {
@@ -120,13 +126,6 @@ sub ircsock_listener_open {
   );
 }
 
-sub ircsock_disconnect {
-  ## FIXME test listener removal first
-  my ($k, $backend) = @_[KERNEL, HEAP];
-  $got->{'got disconnect'}++;
-  $k->yield( shutdown => 1 )
-}
-
 sub ircsock_input {
   my ($k, $backend) = @_[KERNEL, HEAP];
   my ($conn, $ev)   = @_[ARG0 .. $#_];
@@ -137,10 +136,12 @@ sub ircsock_input {
   isa_ok( $ev, 'IRC::Message::Object' );
 
   ## FIXME test ->disconnect() behavior
-  ##  - add disconnect_now?
+
   if ($got->{'got ircsock_input'} == $expected->{'got ircsock_input'}) {
-    #$backend->disconnect( $conn->wheel_id );
-    $k->yield( shutdown => 1 )
+    ## Call for a listener removal to test listener_removed
+    $backend->remove_listener(
+      addr => '127.0.0.1',
+    );
   }
 }
 

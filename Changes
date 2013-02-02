@@ -1,5 +1,11 @@
 # Changes for POEx::IRC::Backend
 
+
+0.022   (02 Feb 2013)
+    Fix and test ->remove_listener()
+    Reset empty hash attrs on shutdown
+    Dispatch remaining ircsock_input even if Connect->is_disconnecting
+
 0.021   (02 Feb 2013)
     POD expansion
 

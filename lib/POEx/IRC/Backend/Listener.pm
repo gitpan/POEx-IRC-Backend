@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Listener;
 {
-  $POEx::IRC::Backend::Listener::VERSION = '0.021';
+  $POEx::IRC::Backend::Listener::VERSION = '0.022';
 }
 
 use 5.10.1;
