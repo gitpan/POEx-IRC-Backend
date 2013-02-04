@@ -79,6 +79,9 @@ sub ircsock_connector_open {
   my ($k, $backend) = @_[KERNEL, HEAP];
   my $conn = $_[ARG0];
 
+  ## OK, technically a Connector that acts like a client
+  ## ought to have a backend with a 'colonify => 0' filter
+
   $got->{'got connector_open'}++;
 
   isa_ok( $conn, 'POEx::IRC::Backend::Connect' );
@@ -130,10 +133,12 @@ sub ircsock_input {
   my ($k, $backend) = @_[KERNEL, HEAP];
   my ($conn, $ev)   = @_[ARG0 .. $#_];
 
-  $got->{'got ircsock_input'}++;
-
   isa_ok( $conn, 'POEx::IRC::Backend::Connect' );
   isa_ok( $ev, 'IRC::Message::Object' );
+
+  if ($ev->params->[0] eq 'testing') {
+    $got->{'got ircsock_input'}++;
+  }
 
   ## FIXME test ->disconnect() behavior
 

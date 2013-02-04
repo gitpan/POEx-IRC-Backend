@@ -1,6 +1,6 @@
 package POEx::IRC::Backend;
 {
-  $POEx::IRC::Backend::VERSION = '0.022';
+  $POEx::IRC::Backend::VERSION = '0.023';
 }
 
 use 5.10.1;
@@ -692,14 +692,7 @@ sub send {
   if ( is_Object($out) ) {
 
     if      ( $out->isa('IRC::Message::Object') ) {
-      $out = {
-        prefix  => $out->prefix,
-        params  => $out->params,
-        command => $out->command,
-        (
-          $out->has_tags ? (tags => $out->tags) : ()
-        )
-      };
+      $out = +{%$out};
     } else {
       confess "No idea what to do with $out",
     }
@@ -888,6 +881,7 @@ L<IRC::Message::Object> objects.
 
 This module is part of a set of IRC building blocks that have been 
 split out of a much larger project; it is also early 'alpha-quality' software.
+
 Take a gander at L<POE::Component::IRC> for a fully-featured IRC library.
 
 

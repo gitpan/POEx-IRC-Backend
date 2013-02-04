@@ -1,5 +1,7 @@
 # Changes for POEx::IRC::Backend
 
+0.023   (04 Feb 2013)
+    Fix handling of IRC::Message::Objects without prefix
 
 0.022   (02 Feb 2013)
     Fix and test ->remove_listener()

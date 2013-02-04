@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::_Util;
 {
-  $POEx::IRC::Backend::_Util::VERSION = '0.022';
+  $POEx::IRC::Backend::_Util::VERSION = '0.023';
 }
 
 use strictures 1;
