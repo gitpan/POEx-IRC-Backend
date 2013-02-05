@@ -1,6 +1,6 @@
 package POEx::IRC::Backend;
 {
-  $POEx::IRC::Backend::VERSION = '0.023';
+  $POEx::IRC::Backend::VERSION = '0.023001';
 }
 
 use 5.10.1;
@@ -692,7 +692,12 @@ sub send {
   if ( is_Object($out) ) {
 
     if      ( $out->isa('IRC::Message::Object') ) {
-      $out = +{%$out};
+      $out = +{
+        command => $out->command,
+        ( $out->has_prefix ? (prefix  => $out->prefix) : () ),
+        ( $out->has_params ? (params  => $out->params) : () ),
+        ( $out->has_tags   ? (tags    => $out->tags  ) : () ),
+      };
     } else {
       confess "No idea what to do with $out",
     }

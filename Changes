@@ -1,5 +1,10 @@
 # Changes for POEx::IRC::Backend
 
+0.023001   (04 Feb 2013)
+    (0.23.1)
+    Fix handling of IRC::Message::Objects with raw line only.
+    Switch to long-form semantic version.
+
 0.023   (04 Feb 2013)
     Fix handling of IRC::Message::Objects without prefix
 

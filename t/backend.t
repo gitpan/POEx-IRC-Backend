@@ -12,7 +12,7 @@ my $expected = {
   'got connector_open'   => 1,
   'got listener_open'    => 1,
   'got listener_removed' => 1,
-  'got ircsock_input'    => 2,
+  'got ircsock_input'    => 3,
 };
 my $got = {};
 
@@ -89,8 +89,12 @@ sub ircsock_connector_open {
   $backend->send(
     {
       command => 'CONNECTOR',
-      params  => [ 'testing', 'things' ],
+      params  => [ 'testing' ],
     },
+    $conn->wheel_id
+  );
+
+  $backend->send( ircmsg( raw_line => ':test CONNECTOR :testing' ),
     $conn->wheel_id
   );
 }
@@ -156,7 +160,7 @@ $poe_kernel->run;
 TEST: for my $name (keys %$expected) {
   ok( defined $got->{$name}, "have result for '$name'")
     or next TEST;
-  cmp_ok( $expected->{$name}, '==', $got->{$name}, 
+  cmp_ok( $got->{$name}, '==', $expected->{$name}, 
     "correct result for '$name'"
   );
 }

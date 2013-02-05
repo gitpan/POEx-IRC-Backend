@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Connector;
 {
-  $POEx::IRC::Backend::Connector::VERSION = '0.023';
+  $POEx::IRC::Backend::Connector::VERSION = '0.023001';
 }
 
 use 5.10.1;
