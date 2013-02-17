@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Connect;
 {
-  $POEx::IRC::Backend::Connect::VERSION = '0.023001';
+  $POEx::IRC::Backend::Connect::VERSION = '0.024000';
 }
 
 use 5.10.1;
@@ -13,7 +13,7 @@ use MooX::Types::MooseLike::Base ':all';
 use namespace::clean;
 
 
-has 'alarm_id' => (
+has alarm_id => (
   ## Idle alarm ID.
   lazy      => 1,
   is        => 'rw',
@@ -22,7 +22,7 @@ has 'alarm_id' => (
 );
 
 
-has 'compressed' => (
+has compressed => (
   ## zlib filter added.
   lazy    => 1,
   is      => 'rwp',
@@ -31,7 +31,7 @@ has 'compressed' => (
 );
 
 
-has 'idle' => (
+has idle => (
   ## Idle delay.
   lazy    => 1,
   is      => 'rwp',
@@ -39,35 +39,35 @@ has 'idle' => (
 );
 
 
-has 'is_client' => (
+has is_client => (
   lazy    => 1,
   is      => 'rw',
   default => sub { 0 },
 );
 
 
-has 'is_peer' => (
+has is_peer => (
   lazy    => 1,
   is      => 'rw',
   default => sub { 0 },
 );
 
 
-has 'is_disconnecting' => (
+has is_disconnecting => (
   ## Bool or string (disconnect message)
   is      => 'rw',
   default => sub { 0 },
 );
 
 
-has 'is_pending_compress' => (
+has is_pending_compress => (
   ## Wheel needs zlib filter after a socket flush.
   is      => 'rw',
   default => sub { 0 },
 );
 
 
-has 'peeraddr' => (
+has peeraddr => (
   required => 1,
   isa      => Str,
   is       => 'ro',
@@ -75,26 +75,26 @@ has 'peeraddr' => (
 );
 
 
-has 'peerport' => (
+has peerport => (
   required => 1,
   is       => 'ro',
   writer   => 'set_peerport',
 );
 
-has 'ping_pending' => (
+has ping_pending => (
   lazy    => 1,
   is      => 'rw',
   default => sub { 0 },
 );
 
-has 'protocol' => (
+has protocol => (
   ## 4 or 6.
   required => 1,
   is       => 'ro',
 );
 
 
-has 'seen' => (
+has seen => (
   ## TS of last activity on this Connect.
   lazy    => 1,
   is      => 'rw',
@@ -102,7 +102,7 @@ has 'seen' => (
 );
 
 
-has 'sockaddr' => (
+has sockaddr => (
   required => 1,
   isa      => Str,
   is       => 'ro',
@@ -110,23 +110,22 @@ has 'sockaddr' => (
 );
 
 
-has 'sockport' => (
+has sockport => (
   required => 1,
   is       => 'ro',
-  writer   => 'set_sockport',
+  writer   => 'set_sockaddr',
 );
 
 
-has 'wheel_id' => (
+has wheel_id => (
   ## Actual POE wheel ID.
   lazy      => 1,
   is        => 'ro',
-  writer    => 'set_wheel_id',
-  predicate => 'has_wheel_id',
+  writer    => '_set_wheel_id',
 );
 
 
-has 'wheel' => (
+has wheel => (
   ## Actual POE::Wheel
   required  => 1,
   isa       => InstanceOf['POE::Wheel'],
@@ -136,7 +135,7 @@ has 'wheel' => (
   predicate => 'has_wheel',
   trigger   => sub {
     my ($self, $wheel) = @_;
-    $self->set_wheel_id( $wheel->ID )
+    $self->_set_wheel_id( $wheel->ID )
   },
 );
 
@@ -168,7 +167,7 @@ timer. Writable attribute.
 
 Set to true if the Zlib filter has been added.
 
-Use B<set_compressed> to change.
+B<set_compressed> can be used to alter the value.
 
 =head2 idle
 
@@ -233,5 +232,7 @@ The (last known) wheel ID.
 =head1 AUTHOR
 
 Jon Portnoy <avenj@cobaltirc.org>
+
+=for Pod::Coverage set_\w+
 
 =cut

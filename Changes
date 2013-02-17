@@ -1,24 +1,34 @@
 # Changes for POEx::IRC::Backend
 
+0.024000   (17 Feb 2013)
+ (0.24.0)
+
+  Clean up Connector/Listener code, kill unneeded writers/predicates
+  (Most of these were a bad idea and unused.)
+  Move common bits to Role::Connector
+
+  Readd POD coverage tests.
+
 0.023001   (04 Feb 2013)
-    (0.23.1)
-    Fix handling of IRC::Message::Objects with raw line only.
-    Switch to long-form semantic version.
+ (0.23.1)
+
+  Fix handling of IRC::Message::Objects with raw line only.
+  Switch to long-form semantic version.
 
 0.023   (04 Feb 2013)
-    Fix handling of IRC::Message::Objects without prefix
+  Fix handling of IRC::Message::Objects without prefix
 
 0.022   (02 Feb 2013)
-    Fix and test ->remove_listener()
-    Reset empty hash attrs on shutdown
-    Dispatch remaining ircsock_input even if Connect->is_disconnecting
+  Fix and test ->remove_listener()
+  Reset empty hash attrs on shutdown
+  Dispatch remaining ircsock_input even if Connect->is_disconnecting
 
 0.021   (02 Feb 2013)
-    POD expansion
+  POD expansion
 
 0.02    (01 Feb 2013)
-    Depend on newer MooX::Types::MooseLike
-    Tweak Connect objs to allow service name in ->port
+  Depend on newer MooX::Types::MooseLike
+  Tweak Connect objs to allow service name in ->port
 
 0.01    (31 Jan 2013)
-    Initial release
+  Initial release

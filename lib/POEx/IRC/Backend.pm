@@ -1,6 +1,6 @@
 package POEx::IRC::Backend;
 {
-  $POEx::IRC::Backend::VERSION = '0.023001';
+  $POEx::IRC::Backend::VERSION = '0.024000';
 }
 
 use 5.10.1;
@@ -887,8 +887,10 @@ L<IRC::Message::Object> objects.
 This module is part of a set of IRC building blocks that have been 
 split out of a much larger project; it is also early 'alpha-quality' software.
 
-Take a gander at L<POE::Component::IRC> for a fully-featured IRC library.
+See L<POEx::IRC::Client::Lite> for an experimental IRC client library using
+this backend.
 
+Take a gander at L<POE::Component::IRC> for a mature, fully-featured IRC library.
 
 =head2 Attributes
 
