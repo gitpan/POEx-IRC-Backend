@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Listener;
 {
-  $POEx::IRC::Backend::Listener::VERSION = '0.024000';
+  $POEx::IRC::Backend::Listener::VERSION = '0.024001';
 }
 use strictures 1;
 use Moo;
@@ -47,12 +47,5 @@ Can be altered via B<set_idle>
 =head1 AUTHOR
 
 Jon Portnoy <avenj@cobaltirc.org>
-
-=begin Pod::Coverage
-
-  set_\w+
-
-=end Pod::Coverage
-
 
 =cut

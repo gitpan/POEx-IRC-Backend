@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Connector;
 {
-  $POEx::IRC::Backend::Connector::VERSION = '0.024000';
+  $POEx::IRC::Backend::Connector::VERSION = '0.024001';
 }
 use strictures 1;
 use Moo;

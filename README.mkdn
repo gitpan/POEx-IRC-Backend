@@ -49,16 +49,18 @@ POEx::IRC::Backend - IRC client or server sockets
 A [POE](http://search.cpan.org/perldoc?POE) IRC backend socket handler using [POE::Filter::IRCv3](http://search.cpan.org/perldoc?POE::Filter::IRCv3) and
 [IRC::Toolkit](http://search.cpan.org/perldoc?IRC::Toolkit).
 
-This can be used by client/server libraries to speak IRC protocol via
+This can be used by client or server libraries to speak IRC protocol via
 [IRC::Message::Object](http://search.cpan.org/perldoc?IRC::Message::Object) objects.
+
+This is a basic low-level interface to IRC connections; 
+see [POEx::IRC::Client::Lite](http://search.cpan.org/perldoc?POEx::IRC::Client::Lite) for an experimental IRC client library using
+this backend.
 
 This module is part of a set of IRC building blocks that have been 
 split out of a much larger project; it is also early 'alpha-quality' software.
 
-See [POEx::IRC::Client::Lite](http://search.cpan.org/perldoc?POEx::IRC::Client::Lite) for an experimental IRC client library using
-this backend.
-
-Take a gander at [POE::Component::IRC](http://search.cpan.org/perldoc?POE::Component::IRC) for a mature, fully-featured IRC library.
+Take a gander at [POE::Component::IRC](http://search.cpan.org/perldoc?POE::Component::IRC) for a mature, fully-featured IRC
+client library.
 
 ## Attributes
 
@@ -340,8 +342,6 @@ Dispatched when a ["register"](#register) event has been successfully received, 
 means of acknowledging the controlling session.
 
 `$_[ARG0]` is the Backend's `$self` object.
-
-
 
 # BUGS
 

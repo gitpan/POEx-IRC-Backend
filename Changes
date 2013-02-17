@@ -1,5 +1,12 @@
 # Changes for POEx::IRC::Backend
 
+0.024001   (17 Feb 2013)
+ (0.24.1)
+
+  Add Role::HasWheel
+
+  POD cleanups
+
 0.024000   (17 Feb 2013)
  (0.24.0)
 

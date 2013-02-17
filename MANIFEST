@@ -12,6 +12,7 @@ lib/POEx/IRC/Backend/Connect.pm
 lib/POEx/IRC/Backend/Connector.pm
 lib/POEx/IRC/Backend/Listener.pm
 lib/POEx/IRC/Backend/Role/Connector.pm
+lib/POEx/IRC/Backend/Role/HasWheel.pm
 lib/POEx/IRC/Backend/_Util.pm
 t/00-report-prereqs.t
 t/backend.t

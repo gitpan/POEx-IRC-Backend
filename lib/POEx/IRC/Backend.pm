@@ -1,6 +1,6 @@
 package POEx::IRC::Backend;
 {
-  $POEx::IRC::Backend::VERSION = '0.024000';
+  $POEx::IRC::Backend::VERSION = '0.024001';
 }
 
 use 5.10.1;
@@ -41,15 +41,6 @@ use POEx::IRC::Backend::Listener;
 use POEx::IRC::Backend::_Util;
 
 
-use namespace::clean;
-
-
-=pod
-
-=for Pod::Coverage has_optional
-
-=cut
-
 our %_Has;
 try {
   require POE::Filter::Zlib::Stream;
@@ -62,7 +53,10 @@ sub has_optional {
 }
 
 
-has 'session_id' => (
+use namespace::clean;
+
+
+has session_id => (
   ## Session ID for own session.
   init_arg  => undef,
   lazy      => 1,
@@ -71,7 +65,7 @@ has 'session_id' => (
   default   => sub { undef },
 );
 
-has 'controller' => (
+has controller => (
   ## Session ID for controller session
   ## Typically set by 'register' event
   lazy      => 1,
@@ -80,7 +74,7 @@ has 'controller' => (
   predicate => 'has_controller',
 );
 
-has 'filter_irc' => (
+has filter_irc => (
   lazy    => 1,
   isa     => InstanceOf['POE::Filter'],
   is      => 'ro',
@@ -89,7 +83,7 @@ has 'filter_irc' => (
   },
 );
 
-has 'filter_line' => (
+has filter_line => (
   lazy    => 1,
   isa     => InstanceOf['POE::Filter'],
   is      => 'ro',
@@ -101,7 +95,7 @@ has 'filter_line' => (
   },
 );
 
-has 'filter' => (
+has filter => (
   lazy    => 1,
   isa     => InstanceOf['POE::Filter'],
   is      => 'ro',
@@ -115,7 +109,7 @@ has 'filter' => (
 
 ## POEx::IRC::Backend::Listener objs
 ## These are listeners for a particular port.
-has 'listeners' => (
+has listeners => (
   init_arg => undef,
   is      => 'ro',
   writer  => '_set_listeners',
@@ -124,7 +118,7 @@ has 'listeners' => (
 
 ## POEx::IRC::Backend::Connector objs
 ## These are outgoing (peer) connectors.
-has 'connectors' => (
+has connectors => (
   init_arg => undef,
   is      => 'ro',
   writer  => '_set_connectors',
@@ -133,7 +127,7 @@ has 'connectors' => (
 
 ## POEx::IRC::Backend::Connect objs
 ## These are our connected wheels.
-has 'wheels' => (
+has wheels => (
   init_arg => undef,
   is      => 'ro',
   writer  => '_set_wheels',
@@ -196,11 +190,9 @@ sub spawn {
       POE::Component::SSLify::SSLify_Options(
         @{ $args{ssl_opts} }
       );
-
       1
     } catch {
       $ssl_err = $_;
-
       undef
     } or confess "SSLify failure: $ssl_err";
   }
@@ -218,17 +210,13 @@ sub _start {
 }
 
 sub _stop {
-
 }
 
 sub shutdown {
   my $self = shift;
-
   $poe_kernel->post( $self->session_id => 
     shutdown => @_ 
-  );
-
-  1
+  )
 }
 
 sub _shutdown {
@@ -881,16 +869,18 @@ POEx::IRC::Backend - IRC client or server sockets
 A L<POE> IRC backend socket handler using L<POE::Filter::IRCv3> and
 L<IRC::Toolkit>.
 
-This can be used by client/server libraries to speak IRC protocol via
+This can be used by client or server libraries to speak IRC protocol via
 L<IRC::Message::Object> objects.
+
+This is a basic low-level interface to IRC connections; 
+see L<POEx::IRC::Client::Lite> for an experimental IRC client library using
+this backend.
 
 This module is part of a set of IRC building blocks that have been 
 split out of a much larger project; it is also early 'alpha-quality' software.
 
-See L<POEx::IRC::Client::Lite> for an experimental IRC client library using
-this backend.
-
-Take a gander at L<POE::Component::IRC> for a mature, fully-featured IRC library.
+Take a gander at L<POE::Component::IRC> for a mature, fully-featured IRC
+client library.
 
 =head2 Attributes
 
@@ -1169,7 +1159,6 @@ Dispatched when a L</register> event has been successfully received, as a
 means of acknowledging the controlling session.
 
 C<$_[ARG0]> is the Backend's C<$self> object.
-
 
 =head1 BUGS
 

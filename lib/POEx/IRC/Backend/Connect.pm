@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Connect;
 {
-  $POEx::IRC::Backend::Connect::VERSION = '0.024000';
+  $POEx::IRC::Backend::Connect::VERSION = '0.024001';
 }
 
 use 5.10.1;
@@ -12,6 +12,7 @@ use MooX::Types::MooseLike::Base ':all';
 
 use namespace::clean;
 
+with 'POEx::IRC::Backend::Role::HasWheel';
 
 has alarm_id => (
   ## Idle alarm ID.
@@ -117,28 +118,6 @@ has sockport => (
 );
 
 
-has wheel_id => (
-  ## Actual POE wheel ID.
-  lazy      => 1,
-  is        => 'ro',
-  writer    => '_set_wheel_id',
-);
-
-
-has wheel => (
-  ## Actual POE::Wheel
-  required  => 1,
-  isa       => InstanceOf['POE::Wheel'],
-  is        => 'ro',
-  clearer   => 'clear_wheel',
-  writer    => 'set_wheel',
-  predicate => 'has_wheel',
-  trigger   => sub {
-    my ($self, $wheel) = @_;
-    $self->_set_wheel_id( $wheel->ID )
-  },
-);
-
 1;
 
 =pod
@@ -158,6 +137,9 @@ These objects contain details regarding connected socket
 L<POE::Wheel::ReadWrite> wheels managed by 
 L<POEx::IRC::Backend>.
 
+Consumes L<POEx::IRC::Backend::Role::HasWheel> and adds the following
+attributes:
+
 =head2 alarm_id
 
 Connected socket wheels normally have a POE alarm ID attached for an idle 
@@ -167,7 +149,9 @@ timer. Writable attribute.
 
 Set to true if the Zlib filter has been added.
 
-B<set_compressed> can be used to alter the value.
+=head2 set_compressed
+
+Change the boolean value of the L</compressed> attrib.
 
 =head2 idle
 
@@ -221,18 +205,10 @@ Our socket address.
 
 Our socket port.
 
-=head2 wheel
-
-The L<POE::Wheel::ReadWrite> wheel instance.
-
-=head2 wheel_id
-
-The (last known) wheel ID.
-
 =head1 AUTHOR
 
 Jon Portnoy <avenj@cobaltirc.org>
 
-=for Pod::Coverage set_\w+
+=for Pod::Coverage set_(?:peer|sock)(?:addr|port)
 
 =cut
