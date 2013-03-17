@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "IRC client or server sockets",
+  "ABSTRACT" => "IRC client or server backend",
   "AUTHOR" => "Jon Portnoy <avenj\@cobaltirc.org>",
   "BUILD_REQUIRES" => {
     "Test::More" => "0.88"
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "strictures" => 1
   },
-  "VERSION" => "0.024001",
+  "VERSION" => "0.024002",
   "test" => {
     "TESTS" => "t/*.t"
   }

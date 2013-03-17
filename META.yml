@@ -1,5 +1,5 @@
 ---
-abstract: 'IRC client or server sockets'
+abstract: 'IRC client or server backend'
 author:
   - 'Jon Portnoy <avenj@cobaltirc.org>'
 build_requires:
@@ -14,7 +14,6 @@ meta-spec:
   version: 1.4
 name: POEx-IRC-Backend
 recommends:
-  Class::XSAccessor: 1.05
   POE::Filter::Zlib::Stream: 0
 requires:
   Carp: 0
@@ -38,4 +37,4 @@ requires:
   strictures: 1
 resources:
   repository: git://github.com/avenj/poex-irc-backend.git
-version: 0.024001
+version: 0.024002

@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Listener;
 {
-  $POEx::IRC::Backend::Listener::VERSION = '0.024001';
+  $POEx::IRC::Backend::Listener::VERSION = '0.024002';
 }
 use strictures 1;
 use Moo;
@@ -23,7 +23,7 @@ has idle  => (
 
 =head1 NAME
 
-POEx::IRC::Backend::Listener - Listener socket details
+POEx::IRC::Backend::Listener - An incoming connection Listener
 
 =head1 SYNOPSIS
 

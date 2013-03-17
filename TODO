@@ -1,0 +1,3 @@
+- Pluggable rate limiters.
+  Each Connect obj should be able to maintain its own queue
+  Should be able to rate limit via coderef & default to hyb algo

@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Role::Connector;
 {
-  $POEx::IRC::Backend::Role::Connector::VERSION = '0.024001';
+  $POEx::IRC::Backend::Role::Connector::VERSION = '0.024002';
 }
 use 5.10.1;
 use strictures 1;
@@ -67,7 +67,7 @@ The local port we are listening on.
 
 Change the current port attribute.
 
-This won't trigger any automatic L</wheel> changes (at this time), 
+This won't trigger any automatic Wheel changes (at this time), 
 but it is useful when creating a listener on port 0.
 
 =head2 protocol

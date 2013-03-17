@@ -11,7 +11,6 @@ use List::Util qw/max/;
 
 my @modules = qw(
   Carp
-  Class::XSAccessor
   Exporter
   ExtUtils::MakeMaker
   IRC::Toolkit

@@ -1,5 +1,13 @@
 # Changes for POEx::IRC::Backend
 
+0.024002   (17 Mar 2013)
+ (0.24.2)
+
+  Typo: sockaddr --> sockport in Backend::Connect
+  (Caught by new Moo-1.1 sanity checks, hurrah \o/)
+
+  POD/test cleanups.
+
 0.024001   (17 Feb 2013)
  (0.24.1)
 

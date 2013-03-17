@@ -1,5 +1,5 @@
 {
-   "abstract" : "IRC client or server sockets",
+   "abstract" : "IRC client or server backend",
    "author" : [
       "Jon Portnoy <avenj@cobaltirc.org>"
    ],
@@ -28,7 +28,6 @@
       },
       "runtime" : {
          "recommends" : {
-            "Class::XSAccessor" : "1.05",
             "POE::Filter::Zlib::Stream" : "0"
          },
          "requires" : {
@@ -67,6 +66,6 @@
          "web" : "https://github.com/avenj/poex-irc-backend"
       }
    },
-   "version" : "0.024001"
+   "version" : "0.024002"
 }
 

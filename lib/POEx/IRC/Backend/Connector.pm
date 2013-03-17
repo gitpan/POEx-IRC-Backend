@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Connector;
 {
-  $POEx::IRC::Backend::Connector::VERSION = '0.024001';
+  $POEx::IRC::Backend::Connector::VERSION = '0.024002';
 }
 use strictures 1;
 use Moo;
@@ -27,7 +27,7 @@ has bindaddr => (
 
 =head1 NAME
 
-POEx::IRC::Backend::Connector - Connector socket details
+POEx::IRC::Backend::Connector - An outgoing connector
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Connect;
 {
-  $POEx::IRC::Backend::Connect::VERSION = '0.024001';
+  $POEx::IRC::Backend::Connect::VERSION = '0.024002';
 }
 
 use 5.10.1;
@@ -114,7 +114,7 @@ has sockaddr => (
 has sockport => (
   required => 1,
   is       => 'ro',
-  writer   => 'set_sockaddr',
+  writer   => 'set_sockport',
 );
 
 
@@ -124,7 +124,7 @@ has sockport => (
 
 =head1 NAME
 
-POEx::IRC::Backend::Connect - Connected socket wheel details
+POEx::IRC::Backend::Connect - A connectoed socket wheel
 
 =head1 SYNOPSIS
 

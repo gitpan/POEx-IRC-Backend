@@ -1,8 +1,11 @@
 # NAME
 
-POEx::IRC::Backend - IRC client or server sockets
+POEx::IRC::Backend - IRC client or server backend
 
 # SYNOPSIS
+
+    use POE;
+    use POEx::IRC::Backend;
 
     ## Spawn a Backend and register as the controlling session.
     my $backend = POEx::IRC::Backend->spawn(

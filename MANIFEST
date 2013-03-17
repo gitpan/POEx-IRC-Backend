@@ -6,6 +6,7 @@ META.yml
 Makefile.PL
 README
 README.mkdn
+TODO
 dist.ini
 lib/POEx/IRC/Backend.pm
 lib/POEx/IRC/Backend/Connect.pm
@@ -16,5 +17,8 @@ lib/POEx/IRC/Backend/Role/HasWheel.pm
 lib/POEx/IRC/Backend/_Util.pm
 t/00-report-prereqs.t
 t/backend.t
+t/release-no-tabs.t
 t/release-pod-coverage.t
+t/release-pod-linkcheck.t
 t/release-pod-syntax.t
+t/release-unused-vars.t
