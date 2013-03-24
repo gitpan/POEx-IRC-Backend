@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Listener;
 {
-  $POEx::IRC::Backend::Listener::VERSION = '0.024002';
+  $POEx::IRC::Backend::Listener::VERSION = '0.024003';
 }
 use strictures 1;
 use Moo;

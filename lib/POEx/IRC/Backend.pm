@@ -1,8 +1,7 @@
 package POEx::IRC::Backend;
 {
-  $POEx::IRC::Backend::VERSION = '0.024002';
+  $POEx::IRC::Backend::VERSION = '0.024003';
 }
-
 use 5.10.1;
 use strictures 1;
 
@@ -20,7 +19,6 @@ use POE qw/
 
   Wheel::ReadWrite
   Wheel::SocketFactory
-  Component::SSLify
 
   Filter::Stackable
   Filter::IRCv3
@@ -40,34 +38,19 @@ use POEx::IRC::Backend::Connector;
 use POEx::IRC::Backend::Listener;
 use POEx::IRC::Backend::_Util;
 
-
-our %_Has;
-try {
-  require POE::Filter::Zlib::Stream;
-  $_Has{zlib} = 1
-};
-
-sub has_optional {
-  my ($val) = @_;
-  $_Has{$val}
-}
-
-
 use namespace::clean;
 
 
 has session_id => (
-  ## Session ID for own session.
   init_arg  => undef,
   lazy      => 1,
   is        => 'ro',
   writer    => '_set_session_id',
-  default   => sub { undef },
 );
 
 has controller => (
   ## Session ID for controller session
-  ## Typically set by 'register' event
+  ## Typically set by 'register' event, though it doesn't have to be:
   lazy      => 1,
   is        => 'ro',
   writer    => '_set_controller',
@@ -113,7 +96,7 @@ has listeners => (
   init_arg => undef,
   is      => 'ro',
   writer  => '_set_listeners',
-  default => sub { {} },
+  default => sub { +{} },
 );
 
 ## POEx::IRC::Backend::Connector objs
@@ -122,7 +105,7 @@ has connectors => (
   init_arg => undef,
   is      => 'ro',
   writer  => '_set_connectors',
-  default => sub { {} },
+  default => sub { +{} },
 );
 
 ## POEx::IRC::Backend::Connect objs
@@ -131,7 +114,7 @@ has wheels => (
   init_arg => undef,
   is      => 'ro',
   writer  => '_set_wheels',
-  default => sub { {} },
+  default => sub { +{} },
 );
 
 
@@ -187,6 +170,7 @@ sub spawn {
 
     my $ssl_err;
     try {
+      require POE::Component::SSLify;
       POE::Component::SSLify::SSLify_Options(
         @{ $args{ssl_opts} }
       );
@@ -230,7 +214,7 @@ sub _shutdown {
     for keys %{ $self->wheels // {} };
 
   for my $attr (map {; '_set_'.$_ } qw/ listeners connectors wheels /) {
-    $self->$attr({})
+    $self->$attr(+{})
   }
 }
 
@@ -238,8 +222,9 @@ sub _register_controller {
   ## 'register' event sets a controller session.
   my ($kernel, $self) = @_[KERNEL, OBJECT];
 
+  $kernel->refcount_decrement( $self->controller, "IRCD Running" )
+    if $self->has_controller;
   $self->_set_controller( $_[SENDER]->ID );
-
   $kernel->refcount_increment( $self->controller, "IRCD Running" );
 
   $kernel->post( $self->controller => 
@@ -262,6 +247,7 @@ sub _accept_conn {
 
   if ( $listener->ssl ) {
     try {
+      require POE::Component::SSLify;
       $sock = POE::Component::SSLify::Client_SSLify($sock)
     } catch {
       warn "Could not SSLify (server) socket: $_";
@@ -493,7 +479,7 @@ sub _create_connector {
   my $remote_addr = delete $args{remoteaddr};
   my $remote_port = delete $args{remoteport};
 
-  confess "_create_connector expects a RemoteAddr and RemotePort"
+  die "create_connector expects a RemoteAddr and RemotePort"
     unless defined $remote_addr and defined $remote_port;
 
   my $protocol = 4;
@@ -551,6 +537,7 @@ sub _connector_up {
 
   if ( $ct->ssl ) {
     try {
+      require POE::Component::SSLify;
       $sock = POE::Component::SSLify::Client_SSLify($sock)
     } catch {
       warn "Could not SSLify (client) socket: $_";
@@ -595,7 +582,7 @@ sub _connector_up {
     ircsock_connector_open => $this_conn
   );
 
-  ## FIXME hum. should we be setting an idle_alarm?
+  ## TODO document that we don't set an idle alarm for open Connectors
 }
 
 sub _connector_failed {
@@ -750,8 +737,7 @@ sub _disconnected {
 sub set_compressed_link {
   my ($self, $w_id) = @_;
 
-  confess "set_compressed_link requires POE::Filter::Zlib::Stream"
-    unless has_optional('zlib');
+  require POE::Filter::Zlib::Stream;
 
   confess "set_compressed_link() needs a wheel ID"
     unless defined $w_id;
@@ -766,8 +752,7 @@ sub set_compressed_link {
 sub set_compressed_link_now {
   my ($self, $w_id) = @_;
 
-  confess "set_compressed_link requires POE::Filter::Zlib::Stream"
-    unless has_optional('zlib');
+  require POE::Filter::Zlib::Stream;
 
   confess "set_compressed_link() needs a wheel ID"
     unless defined $w_id;
@@ -827,32 +812,31 @@ POEx::IRC::Backend - IRC client or server backend
   use POE;
   use POEx::IRC::Backend;
 
-  ## Spawn a Backend and register as the controlling session.
-  my $backend = POEx::IRC::Backend->spawn(
-    ## See POE::Component::SSLify (SSLify_Options):
-    ssl_opts => [ ARRAY ],
-  );
-
+  ## Spawn a Backend and register as the controlling session:
+  my $backend = POEx::IRC::Backend->spawn;
   $poe_kernel->post( $backend->session_id, 'register' );
 
-  $backend->create_listener(
-    bindaddr => $addr,
-    port     => $port,
-    ## Optional:
-    ipv6     => 1,
-    ssl      => 1,
-  );
+  sub ircsock_registered {
+    my ($kernel, $self) = @_[KERNEL, OBJECT];
 
-  $backend->create_connector(
-    remoteaddr => $remote,
-    remoteport => $remoteport,
-    ## Optional:
-    bindaddr => $bindaddr,
-    ipv6     => 1,
-    ssl      => 1,
-  );
+    ## Listen for incoming IRC traffic:
+    $backend->create_listener(
+      bindaddr => $addr,
+      port     => $port,
+    );
 
-  ## Handle and dispatch incoming IRC events.
+    ## Connect to a remote endpoint:
+    $backend->create_connector(
+      remoteaddr => $remote,
+      remoteport => $remoteport,
+      ## Optional:
+      bindaddr => $bindaddr,
+      ipv6     => 1,
+      ssl      => 1,
+    );
+  }
+
+  ## Handle and dispatch incoming IRC events:
   sub ircsock_input {
     my ($kernel, $self) = @_[KERNEL, OBJECT];
 
@@ -941,6 +925,8 @@ HASH of actively connected wheels, keyed on their wheel ID.
       'server.cert',
     ],
   );
+
+Creates the backend's L<POE::Session>.
 
 =head3 create_connector
 

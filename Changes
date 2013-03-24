@@ -1,5 +1,15 @@
 # Changes for POEx::IRC::Backend
 
+0.024003   (23 Mar 2013)
+ (0.24.3)
+
+  Fix a bug that would keep old Controller's Sessions alive unnecessarily
+  if a new Session sent a register.
+
+  Component::SSLify should've been an optional dependency.
+
+  POD cleanups.
+
 0.024002   (17 Mar 2013)
  (0.24.2)
 

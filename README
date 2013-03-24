@@ -5,32 +5,31 @@ SYNOPSIS
       use POE;
       use POEx::IRC::Backend;
 
-      ## Spawn a Backend and register as the controlling session.
-      my $backend = POEx::IRC::Backend->spawn(
-        ## See POE::Component::SSLify (SSLify_Options):
-        ssl_opts => [ ARRAY ],
-      );
-
+      ## Spawn a Backend and register as the controlling session:
+      my $backend = POEx::IRC::Backend->spawn;
       $poe_kernel->post( $backend->session_id, 'register' );
 
-      $backend->create_listener(
-        bindaddr => $addr,
-        port     => $port,
-        ## Optional:
-        ipv6     => 1,
-        ssl      => 1,
-      );
+      sub ircsock_registered {
+        my ($kernel, $self) = @_[KERNEL, OBJECT];
 
-      $backend->create_connector(
-        remoteaddr => $remote,
-        remoteport => $remoteport,
-        ## Optional:
-        bindaddr => $bindaddr,
-        ipv6     => 1,
-        ssl      => 1,
-      );
+        ## Listen for incoming IRC traffic:
+        $backend->create_listener(
+          bindaddr => $addr,
+          port     => $port,
+        );
 
-      ## Handle and dispatch incoming IRC events.
+        ## Connect to a remote endpoint:
+        $backend->create_connector(
+          remoteaddr => $remote,
+          remoteport => $remoteport,
+          ## Optional:
+          bindaddr => $bindaddr,
+          ipv6     => 1,
+          ssl      => 1,
+        );
+      }
+
+      ## Handle and dispatch incoming IRC events:
       sub ircsock_input {
         my ($kernel, $self) = @_[KERNEL, OBJECT];
 
@@ -106,6 +105,8 @@ DESCRIPTION
           'server.cert',
         ],
       );
+
+    Creates the backend's POE::Session.
 
    create_connector
       $backend->create_connector(
