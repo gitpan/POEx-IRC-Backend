@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::_Util;
 {
-  $POEx::IRC::Backend::_Util::VERSION = '0.024003';
+  $POEx::IRC::Backend::_Util::VERSION = '0.024004';
 }
 use strictures 1;
 use Carp;
@@ -11,38 +11,22 @@ our @EXPORT = qw/
 /;
 
 use Socket qw/
-  AF_INET
-  AF_INET6
-  inet_ntop
-  sockaddr_family
-  unpack_sockaddr_in
-  unpack_sockaddr_in6
+  getnameinfo
+  NI_NUMERICHOST
+  NI_NUMERICSERV
+  NIx_NOSERV
 /;
 
 sub get_unpacked_addr {
-  ## v4/v6-compat address unpack.
-  ## FIXME should probably be using getnameinfo
-  my ($sock_packed) = @_;
-  confess "No address passed to get_unpacked_addr"
-    unless defined $sock_packed;
-  my $sock_family = sockaddr_family($sock_packed);
-  my ($inet_proto, $sockaddr, $sockport);
-  FAMILY: {
-    if ($sock_family == AF_INET6) {
-      ($sockport, $sockaddr) = unpack_sockaddr_in6($sock_packed);
-      $sockaddr   = inet_ntop(AF_INET6, $sockaddr);
-      $inet_proto = 6;
-      last FAMILY
-    }
-    if ($sock_family == AF_INET) {
-      ($sockport, $sockaddr) = unpack_sockaddr_in($sock_packed);
-      $sockaddr   = inet_ntop(AF_INET, $sockaddr);
-      $inet_proto = 4;
-      last FAMILY
-    }
-    confess "Unknown socket family type"
-  }
-  ($inet_proto, $sockaddr, $sockport)
+  my ($sock_packed, %params) = @_;
+
+  my ($err, $addr, $port) = getnameinfo $sock_packed,
+     NI_NUMERICHOST | NI_NUMERICSERV,
+      ( $params{noserv} ? NIx_NOSERV : () );
+
+  croak $err if $err;
+
+  $params{noserv} ? $addr : ($addr, $port)
 }
 
 1;

@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::Role::HasWheel;
 {
-  $POEx::IRC::Backend::Role::HasWheel::VERSION = '0.024003';
+  $POEx::IRC::Backend::Role::HasWheel::VERSION = '0.024004';
 }
 use 5.10.1;
 use strictures 1;

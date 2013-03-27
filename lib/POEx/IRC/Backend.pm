@@ -1,6 +1,6 @@
 package POEx::IRC::Backend;
 {
-  $POEx::IRC::Backend::VERSION = '0.024003';
+  $POEx::IRC::Backend::VERSION = '0.024004';
 }
 use 5.10.1;
 use strictures 1;
@@ -26,9 +26,8 @@ use POE qw/
 /;
 
 use Socket qw/
-  AF_INET
-  AF_INET6
-  inet_ntop
+  AF_INET AF_INET6
+  pack_sockaddr_in
 /;
 
 use Try::Tiny;
@@ -237,12 +236,14 @@ sub _accept_conn {
   my (undef, $self) = @_[KERNEL, OBJECT];
   my ($sock, $p_addr, $p_port, $listener_id) = @_[ARG0 .. ARG3];
 
-  ## Our peer's addr.
-  my $type = $_[STATE] eq '_accept_conn_v6' ? AF_INET6 : AF_INET;
-  $p_addr = inet_ntop( $type, $p_addr );
+  my $protocol  = $_[STATE] eq '_accept_conn_v6' ? 6 : 4 ;
+  my $un_p_addr = get_unpacked_addr(
+    (pack_sockaddr_in $p_port, $p_addr), 
+    noserv => 1
+  );
 
   my $sock_packed = getsockname($sock);
-  my ($protocol, $sockaddr, $sockport) = get_unpacked_addr($sock_packed);
+  my ($sockaddr, $sockport) = get_unpacked_addr($sock_packed);
   my $listener = $self->listeners->{$listener_id};
 
   if ( $listener->ssl ) {
@@ -274,7 +275,7 @@ sub _accept_conn {
     protocol => $protocol,
     wheel    => $wheel,
 
-    peeraddr => $p_addr,
+    peeraddr => $un_p_addr,
     peerport => $p_port,
 
     sockaddr => $sockaddr,
@@ -389,7 +390,7 @@ sub _create_listener {
   $self->listeners->{$id} = $listener;
 
   ## Real bound port/addr
-  my (undef, undef, $port) = get_unpacked_addr( $wheel->getsockname );
+  my (undef, $port) = get_unpacked_addr( $wheel->getsockname );
   $listener->set_port($port) if $port;
 
   ## Tell our controller session
@@ -527,10 +528,13 @@ sub _create_connector {
 sub _connector_up {
   ## Created connector socket.
   my ($kernel, $self) = @_[KERNEL, OBJECT];
-  my ($sock, $peeraddr, $peerport, $c_id) = @_[ARG0 .. ARG3];
+  my ($sock, $p_addr, $p_port, $c_id) = @_[ARG0 .. ARG3];
   
-  my $type = $_[STATE] eq '_connector_up_v6' ? AF_INET6 : AF_INET;
-  $peeraddr = inet_ntop( $type, $peeraddr );
+  my $protocol = $_[STATE] eq '_connector_up_v6' ? 6 : 4;
+  my $un_p_addr = get_unpacked_addr( 
+    pack_sockaddr_in( $p_port, $p_addr ), 
+    noserv => 1 
+  );
 
   ## No need to try to connect out any more; remove from connectors pool
   my $ct = delete $self->connectors->{$c_id};
@@ -563,14 +567,13 @@ sub _connector_up {
   my $w_id = $wheel->ID;
 
   my $sock_packed = getsockname($sock);
-  my ($protocol, $sockaddr, $sockport)
-    = get_unpacked_addr($sock_packed);
+  my ($sockaddr, $sockport) = get_unpacked_addr($sock_packed);
 
   my $this_conn = POEx::IRC::Backend::Connect->new(
     protocol => $protocol,
     wheel    => $wheel,
-    peeraddr => $peeraddr,
-    peerport => $peerport,
+    peeraddr => $un_p_addr,
+    peerport => $p_port,
     sockaddr => $sockaddr,
     sockport => $sockport,
     seen => time,

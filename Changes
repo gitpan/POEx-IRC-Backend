@@ -1,5 +1,10 @@
 # Changes for POEx::IRC::Backend
 
+0.024004   (27 Mar 2013)
+ (0.24.4)
+
+  Fix some busted sockaddr handling; fixes some Windows test failures.
+
 0.024003   (23 Mar 2013)
  (0.24.3)
 
