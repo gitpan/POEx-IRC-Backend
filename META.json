@@ -4,7 +4,7 @@
       "Jon Portnoy <avenj@cobaltirc.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -66,6 +66,6 @@
          "web" : "https://github.com/avenj/poex-irc-backend"
       }
    },
-   "version" : "0.024004"
+   "version" : "0.024005"
 }
 

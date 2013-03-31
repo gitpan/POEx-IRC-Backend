@@ -22,3 +22,4 @@ t/release-pod-coverage.t
 t/release-pod-linkcheck.t
 t/release-pod-syntax.t
 t/release-unused-vars.t
+xt/v6.t

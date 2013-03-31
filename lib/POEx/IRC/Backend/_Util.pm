@@ -1,6 +1,6 @@
 package POEx::IRC::Backend::_Util;
 {
-  $POEx::IRC::Backend::_Util::VERSION = '0.024004';
+  $POEx::IRC::Backend::_Util::VERSION = '0.024005';
 }
 use strictures 1;
 use Carp;
