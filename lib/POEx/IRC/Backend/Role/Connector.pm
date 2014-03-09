@@ -1,15 +1,6 @@
 package POEx::IRC::Backend::Role::Connector;
-{
-  $POEx::IRC::Backend::Role::Connector::VERSION = '0.024005';
-}
-use 5.10.1;
-use strictures 1;
-
-use Moo::Role;
-use MooX::Types::MooseLike::Base ':all';
-
-use namespace::clean;
-
+$POEx::IRC::Backend::Role::Connector::VERSION = '0.024006';
+use Moo::Role; use MooX::late;
 with 'POEx::IRC::Backend::Role::HasWheel';
 
 has addr => (

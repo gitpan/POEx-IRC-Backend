@@ -1,69 +1,76 @@
 # Changes for POEx::IRC::Backend
 
-0.024005   (31 Mar 2013)
- (0.24.5)
+0.024006   (08 Mar 2013)
+  
+  - Switch to Type::Tiny
 
-  IPv6 fixes
+  - Drop unnecessary 5.10 dependency
+
+0.024005   (31 Mar 2013)
+
+  - IPv6 fixes
 
 0.024004   (27 Mar 2013)
- (0.24.4)
 
-  Fix some busted sockaddr handling; fixes some Windows test failures.
+  - Fix some busted sockaddr handling; fixes some Windows test failures.
 
 0.024003   (23 Mar 2013)
- (0.24.3)
 
-  Fix a bug that would keep old Controller's Sessions alive unnecessarily
-  if a new Session sent a register.
+  - Fix a bug that would keep old Controller's Sessions alive unnecessarily
+    if a new Session sent a register.
 
-  Component::SSLify should've been an optional dependency.
+  - Component::SSLify should've been an optional dependency.
 
-  POD cleanups.
+  - POD cleanups.
 
 0.024002   (17 Mar 2013)
- (0.24.2)
 
-  Typo: sockaddr --> sockport in Backend::Connect
-  (Caught by new Moo-1.1 sanity checks, hurrah \o/)
+  - Typo: sockaddr --> sockport in Backend::Connect
 
-  POD/test cleanups.
+  - POD/test cleanups.
 
 0.024001   (17 Feb 2013)
- (0.24.1)
 
-  Add Role::HasWheel
+  - Add Role::HasWheel
 
-  POD cleanups
+  - POD cleanups
 
 0.024000   (17 Feb 2013)
- (0.24.0)
 
-  Clean up Connector/Listener code, kill unneeded writers/predicates
-  (Most of these were a bad idea and unused.)
-  Move common bits to Role::Connector
+  - Clean up Connector/Listener code, kill unneeded writers/predicates
+    (Most of these were a bad idea and unused.)
+  
+  - Move common bits to Role::Connector
 
-  Readd POD coverage tests.
+  - Readd POD coverage tests.
 
 0.023001   (04 Feb 2013)
- (0.23.1)
 
-  Fix handling of IRC::Message::Objects with raw line only.
-  Switch to long-form semantic version.
+  - Fix handling of IRC::Message::Objects with raw line only.
+  
+  - Switch to long-form semantic version.
 
 0.023   (04 Feb 2013)
-  Fix handling of IRC::Message::Objects without prefix
+
+  - Fix handling of IRC::Message::Objects without prefix
 
 0.022   (02 Feb 2013)
-  Fix and test ->remove_listener()
-  Reset empty hash attrs on shutdown
-  Dispatch remaining ircsock_input even if Connect->is_disconnecting
+
+  - Fix and test ->remove_listener()
+
+  - Reset empty hash attrs on shutdown
+
+  - Dispatch remaining ircsock_input even if Connect->is_disconnecting
 
 0.021   (02 Feb 2013)
   POD expansion
 
 0.02    (01 Feb 2013)
-  Depend on newer MooX::Types::MooseLike
-  Tweak Connect objs to allow service name in ->port
+
+  - Depend on newer MooX::Types::MooseLike
+  
+  - Tweak Connect objs to allow service name in ->port
 
 0.01    (31 Jan 2013)
-  Initial release
+
+  - Initial release

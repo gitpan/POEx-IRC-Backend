@@ -1,17 +1,13 @@
 package POEx::IRC::Backend::Listener;
-{
-  $POEx::IRC::Backend::Listener::VERSION = '0.024005';
-}
-use strictures 1;
-use Moo;
-use MooX::Types::MooseLike::Base 'Num';
-use namespace::clean;
+$POEx::IRC::Backend::Listener::VERSION = '0.024006';
+use Types::Standard -types;
 
+use Moo; use MooX::late;
 with 'POEx::IRC::Backend::Role::Connector';
 
 has idle  => (
   lazy    => 1,
-  isa     => Num,
+  isa     => StrictNum,
   is      => 'ro',
   writer  => 'set_idle',
   default => sub { 180 },

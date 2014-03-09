@@ -1,11 +1,6 @@
 package POEx::IRC::Backend::Connector;
-{
-  $POEx::IRC::Backend::Connector::VERSION = '0.024005';
-}
-use strictures 1;
+$POEx::IRC::Backend::Connector::VERSION = '0.024006';
 use Moo;
-use namespace::clean;
-
 with 'POEx::IRC::Backend::Role::Connector';
 
 has args => (
@@ -24,6 +19,8 @@ has bindaddr => (
 1;
 
 =pod
+
+=for Pod::Coverage has_\w+
 
 =head1 NAME
 

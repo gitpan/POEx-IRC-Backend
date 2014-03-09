@@ -1,14 +1,7 @@
 package POEx::IRC::Backend;
-{
-  $POEx::IRC::Backend::VERSION = '0.024005';
-}
-use 5.10.1;
+$POEx::IRC::Backend::VERSION = '0.024006';
 use strictures 1;
-
 use Carp;
-
-use Moo;
-use MooX::Types::MooseLike::Base ':all';
 
 use IRC::Message::Object 'ircmsg';
 
@@ -30,6 +23,9 @@ use Socket qw/
   pack_sockaddr_in
 /;
 
+use Types::Standard -all;
+use Types::TypeTiny -all;
+
 use Try::Tiny;
 
 use POEx::IRC::Backend::Connect;
@@ -37,7 +33,9 @@ use POEx::IRC::Backend::Connector;
 use POEx::IRC::Backend::Listener;
 use POEx::IRC::Backend::_Util;
 
+
 use namespace::clean;
+use Moo; use MooX::late;
 
 
 has session_id => (
@@ -94,6 +92,7 @@ has filter => (
 has listeners => (
   init_arg => undef,
   is      => 'ro',
+  isa     => HashRef,
   writer  => '_set_listeners',
   default => sub { +{} },
 );
@@ -103,6 +102,7 @@ has listeners => (
 has connectors => (
   init_arg => undef,
   is      => 'ro',
+  isa     => HashRef,
   writer  => '_set_connectors',
   default => sub { +{} },
 );
@@ -112,6 +112,7 @@ has connectors => (
 has wheels => (
   init_arg => undef,
   is      => 'ro',
+  isa     => HashRef,
   writer  => '_set_wheels',
   default => sub { +{} },
 );
@@ -210,7 +211,7 @@ sub _shutdown {
 
   ## _disconnected should also clear our alarms.
   $self->_disconnected($_, "Server shutdown")
-    for keys %{ $self->wheels // {} };
+    for keys %{ $self->wheels || {} };
 
   for my $attr (map {; '_set_'.$_ } qw/ listeners connectors wheels /) {
     $self->$attr(+{})
@@ -247,7 +248,7 @@ sub _accept_conn {
     );
   }
 
-  my $sock_packed = getsockname($sock);
+  my $sock_packed = getsockname $sock;
   my ($sockaddr, $sockport) = get_unpacked_addr($sock_packed);
   my $listener = $self->listeners->{$listener_id};
 
@@ -256,7 +257,7 @@ sub _accept_conn {
       require POE::Component::SSLify;
       $sock = POE::Component::SSLify::Client_SSLify($sock)
     } catch {
-      warn "Could not SSLify (server) socket: $_";
+      warn "Could not SSLify (server) socket: $_\n";
       undef
     } or return;
   }
@@ -360,23 +361,17 @@ sub _create_listener {
 
   $args{lc $_} = delete $args{$_} for keys %args;
 
-  my $idle_time = delete $args{idle}     || 180;
+  my $bindaddr  = $args{bindaddr} || '0.0.0.0';
+  my $bindport  = $args{port}     || 0;
 
-  my $bindaddr  = delete $args{bindaddr} || '0.0.0.0';
-  my $bindport  = delete $args{port}     || 0;
-
-  my $protocol = 4;
-  $protocol = 6
-    if delete $args{ipv6} or ip_is_ipv6($bindaddr);
-
-  my $ssl = delete $args{ssl} || 0;
+  my $protocol = ( $args{ipv6} || ip_is_ipv6($bindaddr) ) ? 6 : 4;
 
   my $wheel = POE::Wheel::SocketFactory->new(
     SocketDomain => ($protocol == 6 ? AF_INET6 : AF_INET),
     BindAddress  => $bindaddr,
     BindPort     => $bindport,
     SuccessEvent => 
-      ($protocol == 6 ? '_accept_conn_v6' : '_accept_conn_v4' ),
+      ( $protocol == 6 ? '_accept_conn_v6' : '_accept_conn_v4' ),
     FailureEvent => '_accept_fail',
     Reuse        => 1,
   );
@@ -388,8 +383,8 @@ sub _create_listener {
     wheel => $wheel,
     addr  => $bindaddr,
     port  => $bindport,
-    idle  => $idle_time,
-    ssl   => $ssl,
+    idle  => ( $args{idle} || 180 ),
+    ssl   => ( $args{ssl}  || 0 ),
   );
 
   $self->listeners->{$id} = $listener;
@@ -477,6 +472,7 @@ sub _create_connector {
   ##  bindaddr =>
   ##  ipv6 =>
   ##  ssl  =>
+  ## ... other args get added to ->args()
   my (undef, $self) = @_[KERNEL, OBJECT];
   my %args = @_[ARG0 .. $#_];
 
@@ -485,12 +481,14 @@ sub _create_connector {
   my $remote_addr = delete $args{remoteaddr};
   my $remote_port = delete $args{remoteport};
 
-  die "create_connector expects a RemoteAddr and RemotePort"
+  die "create_connector expects a RemoteAddr and RemotePort\n"
     unless defined $remote_addr and defined $remote_port;
 
-  my $protocol = 4;
-  $protocol = 6
-    if delete $args{ipv6} or ip_is_ipv6($remote_addr);
+  my $protocol =
+      delete($args{ipv6})                                ? 6
+    : ip_is_ipv6($remote_addr)                           ? 6
+    : ( $args{bindaddr} && ip_is_ipv6($args{bindaddr}) ) ? 6
+    : 4;
 
   my $wheel = POE::Wheel::SocketFactory->new(
     SocketDomain   => ($protocol == 6 ? AF_INET6 : AF_INET),
@@ -554,7 +552,7 @@ sub _connector_up {
       require POE::Component::SSLify;
       $sock = POE::Component::SSLify::Client_SSLify($sock)
     } catch {
-      warn "Could not SSLify (client) socket: $_";
+      warn "Could not SSLify (client) socket: $_\n";
       undef
     } or return;
   }
@@ -576,7 +574,7 @@ sub _connector_up {
 
   my $w_id = $wheel->ID;
 
-  my $sock_packed = getsockname($sock);
+  my $sock_packed = getsockname $sock;
   my ($sockaddr, $sockport) = get_unpacked_addr($sock_packed);
 
   my $this_conn = POEx::IRC::Backend::Connect->new(
@@ -808,13 +806,15 @@ sub unset_compressed_link {
 ## FIXME listener connect ip blacklist?
 
 no warnings 'void';
-q{
- <CaptObviousman> pretend for a moment that I'm stuck with mysql
- <rnowak> ok, fetching my laughing hat and monocle
-};
+print
+ qq[<CaptObviousman> pretend for a moment that I'm stuck with mysql\n],
+ qq[<rnowak> ok, fetching my laughing hat and monocle\n],
+unless caller; 1;
 
 
 =pod
+
+=for Pod::Coverage has_\w+
 
 =head1 NAME
 

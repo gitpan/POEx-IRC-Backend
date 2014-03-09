@@ -51,7 +51,8 @@ sub shutdown {
   $k->alarm_remove_all;
   $k->post( $backend->session_id, 'shutdown' );
   if ($_[ARG0] && $_[ARG0] eq 'timeout') {
-    fail("Timed out")
+    fail("Timed out");
+    diag explain $got;
   }
 }
 
@@ -137,7 +138,7 @@ sub ircsock_input {
   if ($got->{'got ircsock_input'} == $expected->{'got ircsock_input'}) {
     ## Call for a listener removal to test listener_removed
     $backend->remove_listener(
-      addr => '127.0.0.1',
+      addr => '::0',
     );
   }
 }

@@ -1,17 +1,9 @@
 package POEx::IRC::Backend::Connect;
-{
-  $POEx::IRC::Backend::Connect::VERSION = '0.024005';
-}
-
-use 5.10.1;
-use strictures 1;
+$POEx::IRC::Backend::Connect::VERSION = '0.024006';
 use Carp;
+use Types::Standard -all;
 
-use Moo;
-use MooX::Types::MooseLike::Base ':all';
-
-use namespace::clean;
-
+use Moo; use MooX::late;
 with 'POEx::IRC::Backend::Role::HasWheel';
 
 has alarm_id => (
@@ -27,8 +19,9 @@ has compressed => (
   ## zlib filter added.
   lazy    => 1,
   is      => 'rwp',
+  isa     => Bool,
   writer  => 'set_compressed',
-  default => sub { 0 },
+  default => sub { !!0 },
 );
 
 
@@ -36,6 +29,7 @@ has idle => (
   ## Idle delay.
   lazy    => 1,
   is      => 'rwp',
+  isa     => StrictNum,
   default => sub { 180 },
 );
 
@@ -43,28 +37,32 @@ has idle => (
 has is_client => (
   lazy    => 1,
   is      => 'rw',
-  default => sub { 0 },
+  isa     => Bool,
+  default => sub { !!0 },
 );
 
 
 has is_peer => (
   lazy    => 1,
   is      => 'rw',
-  default => sub { 0 },
+  isa     => Bool,
+  default => sub { !!0 },
 );
 
 
 has is_disconnecting => (
   ## Bool or string (disconnect message)
   is      => 'rw',
-  default => sub { 0 },
+  isa     => (Bool | Str),
+  default => sub { !!0 },
 );
 
 
 has is_pending_compress => (
   ## Wheel needs zlib filter after a socket flush.
   is      => 'rw',
-  default => sub { 0 },
+  isa     => Bool,
+  default => sub { !!0 },
 );
 
 
@@ -92,6 +90,7 @@ has protocol => (
   ## 4 or 6.
   required => 1,
   is       => 'ro',
+  isa      => StrictNum,
 );
 
 
@@ -122,6 +121,8 @@ has sockport => (
 
 =pod
 
+=for Pod::Coverage has_\w+
+
 =head1 NAME
 
 POEx::IRC::Backend::Connect - A connectoed socket wheel
@@ -144,6 +145,8 @@ attributes:
 
 Connected socket wheels normally have a POE alarm ID attached for an idle 
 timer. Writable attribute.
+
+Predicate: B<has_alarm_id>
 
 =head2 compressed
 

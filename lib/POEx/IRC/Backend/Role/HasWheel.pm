@@ -1,14 +1,9 @@
 package POEx::IRC::Backend::Role::HasWheel;
-{
-  $POEx::IRC::Backend::Role::HasWheel::VERSION = '0.024005';
-}
-use 5.10.1;
+$POEx::IRC::Backend::Role::HasWheel::VERSION = '0.024006';
 use strictures 1;
 
-use Moo::Role;
-use MooX::Types::MooseLike::Base ':all';
-
-use namespace::clean;
+use Types::Standard -all;
+use Moo::Role; use MooX::late;
 
 has wheel_id => (
   lazy    => 1,
@@ -33,6 +28,8 @@ has wheel => (
 1;
 
 =pod
+
+=for Pod::Coverage has_\w+
 
 =head1 NAME
 
